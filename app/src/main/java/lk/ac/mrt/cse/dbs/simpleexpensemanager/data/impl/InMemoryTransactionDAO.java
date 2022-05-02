@@ -34,18 +34,15 @@ public class InMemoryTransactionDAO implements TransactionDAO {
     public InMemoryTransactionDAO() {
         transactions = new LinkedList<>();
     }
-
     @Override
     public void logTransaction(Date date, String accountNo, ExpenseType expenseType, double amount) {
         Transaction transaction = new Transaction(date, accountNo, expenseType, amount);
         transactions.add(transaction);
     }
-
     @Override
     public List<Transaction> getAllTransactionLogs() {
         return transactions;
     }
-
     @Override
     public List<Transaction> getPaginatedTransactionLogs(int limit) {
         int size = transactions.size();
