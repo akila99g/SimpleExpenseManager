@@ -26,6 +26,7 @@ import androidx.test.core.app.ApplicationProvider;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class ApplicationTest {
         expenseManager.addAccount("190239A","BOC","Akila",10000.00);
         try {
             //log new transaction
-            expenseManager.updateAccountBalance("190239A",10,5,2022, ExpenseType.EXPENSE,"1000.00");
+            expenseManager.updateAccountBalance("190239A",10,4,2022, ExpenseType.EXPENSE,"1000.00"); //month May=4 (indexing)
 
             //get transactions list
             List<Transaction> transactions = expenseManager.getTransactionLogs();
@@ -71,8 +72,8 @@ public class ApplicationTest {
             assertEquals(1000.00, lastTransaction.getAmount(), 0.0);
             assertEquals(ExpenseType.EXPENSE,lastTransaction.getExpenseType());
             assertEquals("190239A",lastTransaction.getAccountNo());
-            Date date = new Date("Fri Jun 10 00:00:00 GMT+05:30 2022");
-            assertEquals(date,lastTransaction.getDate());
+            String retrievedDate = new SimpleDateFormat("dd-MM-yyyy").format(lastTransaction.getDate());
+            assertEquals("10-05-2022",retrievedDate);
 
         } catch (InvalidAccountException e) {
             e.printStackTrace();
