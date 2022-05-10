@@ -16,14 +16,67 @@
 
 package lk.ac.mrt.cse.dbs.simpleexpensemanager;
 
-import android.app.Application;
-import android.test.ApplicationTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-/**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
- */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
+import android.content.Context;
+
+import androidx.test.core.app.ApplicationProvider;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Date;
+import java.util.List;
+
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.ExpenseManager;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.PersistentExpenseManager;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.exception.InvalidAccountException;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Transaction;
+
+public class ApplicationTest {
+    private static ExpenseManager expenseManager;
+
+    @Before
+    public void setUp() {
+        Context context = ApplicationProvider.getApplicationContext();
+        expenseManager = new PersistentExpenseManager(context);
     }
+
+    @Test
+    public void testAddAccount() {
+        //add new account
+        expenseManager.addAccount("190239A","BOC","Akila",10000.00);
+        //get the accounts list
+        List<String> accNums = expenseManager.getAccountNumbersList();
+
+        //check the retrieved list contains added account
+        assertTrue(accNums.contains("190239A"));
+    }
+
+    @Test
+    public void  testLogTransaction(){
+        expenseManager.addAccount("190239A","BOC","Akila",10000.00);
+        try {
+            //log new transaction
+            expenseManager.updateAccountBalance("190239A",10,5,2022, ExpenseType.EXPENSE,"1000.00");
+
+            //get transactions list
+            List<Transaction> transactions = expenseManager.getTransactionLogs();
+            //filter out last transaction
+            Transaction lastTransaction = transactions.get(transactions.size()-1);
+
+            //compare the values of the retrieved transaction
+            assertEquals(1000.00, lastTransaction.getAmount(), 0.0);
+            assertEquals(ExpenseType.EXPENSE,lastTransaction.getExpenseType());
+            assertEquals("190239A",lastTransaction.getAccountNo());
+            Date date = new Date("Fri Jun 10 00:00:00 GMT+05:30 2022");
+            assertEquals(date,lastTransaction.getDate());
+
+        } catch (InvalidAccountException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
